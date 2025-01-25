@@ -1,0 +1,279 @@
+'use client'
+
+import { useRef } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import clsx from 'clsx'
+import { AnimatePresence, motion, useIsPresent } from 'framer-motion'
+import { Button } from '@/components/Button'
+import { useIsInsideMobileNavigation } from '@/components/MobileNavigation'
+import { useSectionStore } from '@/components/SectionProvider'
+import { Tag } from '@/components/Tag'
+import { remToPx } from '@/lib/remToPx'
+
+import { useRouter } from 'next/navigation'
+
+function useInitialValue(value, condition = true) {
+  let initialValue = useRef(value).current
+  return condition ? initialValue : value
+}
+
+function TopLevelNavItem({ href, children }) {
+  return (
+    <li className="md:hidden">
+      <Link
+        href={href}
+        className="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900"
+      >
+        {children}
+      </Link>
+    </li>
+  )
+}
+
+function NavLink({
+  href,
+  children,
+  tag,
+  active = false,
+  isAnchorLink = false,
+  router
+}) {
+
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={clsx(
+        'flex justify-between gap-2 py-1 pr-3 text-sm transition',
+        isAnchorLink ? 'pl-7' : 'pl-4',
+        active
+          ? 'text-zinc-900 font-semibold'
+          : 'text-zinc-900 hover:text-green-900 hover:bg-green-100 hover:rounded-md',
+      )}
+    >
+      <span className="truncate">{children}</span>
+      {tag && (
+        <Tag variant="small" color="zinc">
+          {tag}
+        </Tag>
+      )}
+    </Link>
+    
+    // <button 
+    //   type="button" 
+    //   onClick={() => router.push(href)}
+    //   className={clsx(
+    //     'flex justify-between gap-2 py-1 pr-3 text-sm transition',
+    //     isAnchorLink ? 'pl-7' : 'pl-4',
+    //     active
+    //       ? 'text-zinc-900 font-semibold'
+    //       : 'text-zinc-900 hover:text-green-900 hover:bg-green-100 hover:rounded-md',
+    //   )}
+    // >
+    //     <span className="truncate">{children}</span>
+    // </button>
+
+  )
+}
+
+function VisibleSectionHighlight({ group, pathname }) {
+  let [sections, visibleSections] = useInitialValue(
+    [
+      useSectionStore((s) => s.sections),
+      useSectionStore((s) => s.visibleSections),
+    ],
+    useIsInsideMobileNavigation(),
+  )
+
+  let isPresent = useIsPresent()
+  let firstVisibleSectionIndex = Math.max(
+    0,
+    [{ id: '_top' }, ...sections].findIndex(
+      (section) => section.id === visibleSections[0],
+    ),
+  )
+  let itemHeight = remToPx(2)
+  let height = isPresent
+    ? Math.max(1, visibleSections.length) * itemHeight
+    : itemHeight
+  let top =
+    group.links.findIndex((link) => link.href === pathname) * itemHeight +
+    firstVisibleSectionIndex * itemHeight
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { delay: 0.2 } }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-x-0 top-0 bg-[#fef5e4] will-change-transform"
+      style={{ borderRadius: 8, height, top }}
+    />
+  )
+}
+
+function ActivePageMarker({ group, pathname }) {
+  let itemHeight = remToPx(2)
+  let offset = remToPx(0.25)
+  let activePageIndex = group.links.findIndex((link) => link.href === pathname)
+  let top = offset + activePageIndex * itemHeight
+
+  return (
+    <motion.div
+      layout
+      className="absolute left-2 h-6 w-px bg-[#F6C794]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { delay: 0.2 } }}
+      exit={{ opacity: 0 }}
+      style={{ top }}
+    />
+  )
+}
+
+function NavigationGroup({ group, className, router }) {
+  // If this is the mobile navigation then we always render the initial
+  // state, so that the state does not change during the close animation.
+  // The state will still update when we re-open (re-render) the navigation.
+  let isInsideMobileNavigation = useIsInsideMobileNavigation()
+  let [pathname, sections] = useInitialValue(
+    [usePathname(), useSectionStore((s) => s.sections)],
+    isInsideMobileNavigation,
+  )
+
+  let isActiveGroup =
+    group.links.findIndex((link) => link.href === pathname) !== -1
+
+  return (
+    <li className={clsx('relative mt-6', className)}>
+      <motion.h2
+        layout="position"
+        className="text-xs font-semibold text-zinc-900"
+      >
+        {group.title}
+      </motion.h2>
+      <div className="relative mt-3 pl-2">
+        <AnimatePresence initial={!isInsideMobileNavigation}>
+          {isActiveGroup && (
+            <VisibleSectionHighlight group={group} pathname={pathname} />
+          )}
+        </AnimatePresence>
+        <motion.div
+          layout
+          className="absolute inset-y-0 left-2 w-px bg-zinc-900/10"
+        />
+        <AnimatePresence initial={false}>
+          {isActiveGroup && (
+            <ActivePageMarker group={group} pathname={pathname} />
+          )}
+        </AnimatePresence>
+        <ul role="list" className="border-l border-transparent">
+          {group.links.map((link) => (
+            <motion.li key={link.href} layout="position" className="relative">
+              <NavLink href={link.href} active={link.href === pathname} router={router}>
+                {link.title}
+              </NavLink>
+              <AnimatePresence mode="popLayout" initial={false}>
+                {link.href === pathname && sections.length > 0 && (
+                  <motion.ul
+                    role="list"
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: 1,
+                      transition: { delay: 0.1 },
+                    }}
+                    exit={{
+                      opacity: 0,
+                      transition: { duration: 0.15 },
+                    }}
+                  >
+                    {sections.map((section) => (
+                      <li key={section.id}>
+                        <NavLink
+                          href={`${link.href}#${section.id}`}
+                          tag={section.tag}
+                          isAnchorLink
+                          router={router}
+                        >
+                          {section.title}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
+    </li>
+  )
+}
+
+export const navigation = [
+  {
+    title: 'Tự kỷ',
+    links: [
+      { title: 'Tôi cần làm gì', href: '/toi-can-lam-gi'},
+      { title: 'Tự kỷ là gì', href: '/tu-ky-la-gi'},
+      { title: 'Rối loạn phổ tự kỷ', href: '/roi-loan-pho-tu-ky'},
+      { title: 'Nguyên nhân', href: '/nguyen-nhan' },
+      { title: 'Dấu hiệu sớm', href: '/dau-hieu-som' },
+      { title: 'Đặc điểm', href: '/dac-diem'},
+      { title: 'Tầm soát', href: '/tam-soat'},
+      { title: 'Chẩn đoán', href: '/chan-doan'},
+      { title: 'Điều trị - Can thiệp', href: '/dieu-tri'},
+      { title: 'Điều trị bằng thuốc', href: '/dieu-tri-bang-thuoc'},
+      { title: 'Chăm sóc', href: '/cham-soc'},
+      // { title: '', href: '/'},
+      
+    ],
+  },
+  // {
+  //   title: 'Ngôn ngữ và giao tiếp',
+  //   links: [
+  //     { title: '', href: '/' },
+      
+  //   ],
+  // },
+  // {
+  //   title: 'Thuật ngữ và ví dụ',
+  //   links: [
+  //     { title: '', href: '/' },
+      
+  //   ],
+  // },
+  // {
+  //   title: 'Phương tiện hỗ trợ',
+  //   links: [
+  //     { title: '', href: '/' },
+      
+  //   ],
+  // },
+]
+
+export function Navigation(props) {
+  const router = useRouter()
+  return (
+    <nav {...props}>
+      <ul role="list">
+        {/* <TopLevelNavItem href="/">Giới thiệu</TopLevelNavItem>
+        <TopLevelNavItem href="#">Đội ngũ</TopLevelNavItem>
+        <TopLevelNavItem href="#"></TopLevelNavItem> */}
+        {navigation.map((group, groupIndex) => (
+          <NavigationGroup
+            key={group.title}
+            group={group}
+            className={groupIndex === 0 ? 'md:mt-0' : ''}
+            router={router}
+          />
+        ))}
+        <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
+          {/* <Button href="#" variant="filled" className="w-full">
+            Sign in
+          </Button> */}
+        </li>
+      </ul>
+    </nav>
+  )
+}
