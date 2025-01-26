@@ -1,11 +1,18 @@
 import { HeroPattern } from '@/components/HeroPattern'
 import { LinkNavigate } from '@/components/LinkNavigate'
+import Head from 'next/head'
 
 export const metadata = {
   title: 'Giới thiệu',
   description:
     'Giới thiệu về website.',
 }
+
+<Head>
+  <title>Giới thiệu | Tự kỷ 123</title>
+  <meta name="description" content="Giới thiệu về website."/>
+  <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"></meta>
+</Head>
 
 <HeroPattern />
 
