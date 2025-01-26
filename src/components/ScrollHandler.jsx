@@ -16,7 +16,7 @@ export function ScrollHandler() {
         if (element) {
           setTimeout(() => {
             element.scrollIntoView({ behavior: 'instant', block: 'start' });
-          }, 1000)
+          }, 500)
         }
       } else { 
         setTimeout(() => {
@@ -26,7 +26,7 @@ export function ScrollHandler() {
             left: 0,
             behavior: "instant", 
           });
-        }, 1000)
+        }, 500)
       }
     }
     // } else {

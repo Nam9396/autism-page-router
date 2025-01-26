@@ -425,7 +425,7 @@ export function MobileSearch() {
       <button
         type="button"
         className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 ui-not-focus-visible:outline-none lg:hidden"
-        aria-label="Find something..."
+        aria-label="Nhập từ khóa..."
         {...buttonProps}
       >
         <SearchIcon className="h-5 w-5 stroke-zinc-900" />
