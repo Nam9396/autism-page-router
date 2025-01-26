@@ -160,7 +160,7 @@ export function Layout({ children }) {
           "id": "tre-khong-biet-dau"
         }
       ],
-      "/dieu-tri": [
+      "/can-thiep": [
         {
           "title": "Những khó khăn thường gặp",
           "id": "nhung-kho-khan-thuong-gap"
@@ -230,7 +230,7 @@ export function Layout({ children }) {
           "id": "huan-luyen-cac-ki-nang-xa-hoi"
         }
       ],
-      "/dieu-tri-bang-thuoc": [
+      "/can-thiep-bang-thuoc": [
         {
           "title": "Vai trò của điều trị bằng thuốc",
           "id": "vai-tro-cua-dieu-tri-bang-thuoc"

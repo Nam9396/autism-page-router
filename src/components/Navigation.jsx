@@ -222,8 +222,8 @@ export const navigation = [
       { title: 'Đặc điểm', href: '/dac-diem'},
       { title: 'Tầm soát', href: '/tam-soat'},
       { title: 'Chẩn đoán', href: '/chan-doan'},
-      { title: 'Điều trị - Can thiệp', href: '/dieu-tri'},
-      { title: 'Điều trị bằng thuốc', href: '/dieu-tri-bang-thuoc'},
+      { title: 'Can thiệp', href: '/can-thiep'},
+      { title: 'Can thiệp bằng thuốc', href: '/can-thiep-bang-thuoc'},
       { title: 'Chăm sóc', href: '/cham-soc'},
       // { title: '', href: '/'},
       
