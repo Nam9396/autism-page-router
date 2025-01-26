@@ -7,28 +7,43 @@ export function ScrollHandler() {
 
   useEffect(() => {
     const url = router.asPath
-    console.log('Current url: ', url)
     const hash = url.match(/#(.*)$/)?.[1] || ""
-    console.log('Current hash: ', hash)
-    if (hash) { 
-      const element = document.getElementById(hash)
-      console.log(element)
-      if (element) {
+    const isMobile = () => window.innerWidth <= 768
+
+    if (isMobile) { 
+      if (hash) { 
+        const element = document.getElementById(hash)
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'instant', block: 'start' });
+          }, 1000)
+        }
+      } else { 
         setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 2000)
-        
+          window.scrollTo({
+            // top: document.documentElement.scrollHeight,
+            top: 0,
+            left: 0,
+            behavior: "instant", 
+          });
+        }, 1000)
       }
-    } else { 
-      setTimeout(() => {
-        window.scrollTo({
-          // top: document.documentElement.scrollHeight,
-          top: 0,
-          left: 0,
-          behavior: "smooth", 
-        });
-      }, 2000)
     }
+    // } else {
+    //   if (hash) { 
+    //     const element = document.getElementById(hash)
+    //     if (element) {
+    //       element.scrollIntoView({ behavior: 'instant', block: 'start' })
+    //     }
+    //   } else { 
+    //     window.scrollTo({
+    //       // top: document.documentElement.scrollHeight,
+    //       top: 0,
+    //       left: 0,
+    //       behavior: "instant", 
+    //     })
+    //   }
+    // }
   }, [router.asPath])
 
   return null // No UI for this handler
