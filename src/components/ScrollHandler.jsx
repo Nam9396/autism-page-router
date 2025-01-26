@@ -34,48 +34,73 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-export function useHash() {
-  const router = useRouter()
-  const [hash, setHash] = useState(() => {
-    // Initialize hash only if running in the browser
-    if (typeof window !== 'undefined') {
-      return window.location.hash;
-    }
-    return ''; // Return an empty string on the server
-  });
-  useEffect(() => {
-    const handleHashChange = () => {
-      setHash(window.location.hash);
-    };
-    window.addEventListener('hashchange', handleHashChange);
+// export function useHash() {
+//   const router = useRouter()
+//   const [hash, setHash] = useState(() => {
+//     // Initialize hash only if running in the browser
+//     if (typeof window !== 'undefined') {
+//       return window.location.hash;
+//     }
+//     return ''; // Return an empty string on the server
+//   });
 
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, [router.asPath]);
-  return hash;
-}
+//   useEffect(() => {
+//     const handleHashChange = () => {
+//       setHash(window.location.hash);
+//     };
+//     window.addEventListener('hashchange', handleHashChange);
+
+//     return () => {
+//       window.removeEventListener('hashchange', handleHashChange);
+//     };
+//   }, [router.asPath]);
+
+//   return hash;
+// }
 
 
 export function ScrollHandler() {
-  const currentHash = useHash()
+  // const currentHash = useHash()
   const router = useRouter()
-  const path = router.pathname
+  // const path = router.pathname
+  // const asPath = router.asPath
 
-  console.log('hello: ', currentHash)
+  // console.log('Current hash: ', currentHash)
 
-  console.log('hi', path)
+  // console.log('pathName: ', path)
+
+  // console.log('asPath: ', asPath)
+
+  // useEffect(() => {
+  //   console.log('Current hash: ', window.location.hash)
+  //   if (window.location.hash) { 
+  //     const element = document.getElementById(window.location.hash.replace('#', ''))
+  //     console.log(element)
+  //     if (element) {
+  //       element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  //     }
+  //   }
+  // }, [asPath])
 
   useEffect(() => {
-    console.log('Current hash: ', window.location.hash)
-    if (window.location.hash) { 
-      const element = document.getElementById(window.location.hash.replace('#', ''))
+    const url = router.asPath
+    console.log('Current url: ', url)
+    const hash = url.match(/#(.*)$/)?.[1] || ""
+    console.log('Current hash: ', hash)
+    if (hash) { 
+      const element = document.getElementById(hash)
       console.log(element)
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
+    } else { 
+      window.scrollTo({
+        top: document.documentElement.scrollHeight, // Scroll to the bottom
+        left: 0,
+        behavior: "smooth", // Smooth scrolling (optional)
+      });
     }
-  }, [])
+  }, [router.asPath])
 
   return null // No UI for this handler
 }
