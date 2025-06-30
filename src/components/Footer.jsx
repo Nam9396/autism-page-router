@@ -68,7 +68,7 @@ function SmallPrint() {
   return (
     <div className="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 sm:flex-row">
       <p className="text-xs font-bold text-zinc-800">
-        Tự kỷ 123 | Địa chỉ liên hệ: nguyenthanhnam9396@gmail.com
+        Tự kỷ Cẩm nang | Địa chỉ liên hệ: nguyenthanhnam9396@gmail.com
       </p>
       <p className="text-xs text-zinc-600">
         &copy; Copyright {new Date().getFullYear()}. All rights reserved.
